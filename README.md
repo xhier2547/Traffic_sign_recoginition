@@ -44,6 +44,8 @@ pip install -r requirements.txt
 ### **4.  ดาวน์โหลด Dataset**
 
 https://drive.google.com/drive/folders/1dlVGudBMMXZLF2dJeVA1V7j6ybajvXIV?usp=sharing
+
+
 *หลังจากนั้นให้ทำการแตกไฟล์ไว้ในโฟลเดอร์ของโปรเจค โดยมีชื่อโฟลเดอร์ว่า Dataset และ ภายในประกอบด้วย class ทั้ง 44(0-43) class*
 
 ### **5.  การ Train โมเดล**
@@ -69,8 +71,15 @@ python app.py
 
 *3. เปิด **http://127.0.0.1:5000** ในเว็บเบราว์เซอร์*
 
+
 ---
 
 ### **หมายเหตุ**
 **ไฟล์ model.h5 เป็นไฟล์โมเดลที่ Train แล้ว สามารถใช้ทดสอบได้ทันที**
 **หากต้องการ Train โมเดลใหม่ ควรมี Dataset ป้ายจราจร พร้อมใช้งาน**
+
+---
+
+### **ติดต่อ**
+**Discord : xhao.none**
+**Email : aphilakjankaewdach@gmail.com**
