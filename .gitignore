@@ -1,0 +1,5 @@
+# ไม่อัปโหลด Virtual Environment
+.venv/
+
+# ไม่อัปโหลด Dataset
+Dataset/
