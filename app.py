@@ -24,7 +24,7 @@ def detect_traffic_sign_yolo12(image_path, output_path="static/detected_image.jp
             detected = True
 
             # วาดกรอบสี่เหลี่ยม
-            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
+            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.putText(img, "Traffic Sign", (x1, y1 - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
@@ -53,7 +53,7 @@ def preprocess_and_predict(image_path):
     img = cv2.cvtColor(cropped_sign, cv2.COLOR_BGR2GRAY)
     img = cv2.equalizeHist(img)
     img = img / 255.0  # Normalize
-    img = cv2.resize(img, (32, 32))  # Resize ให้ CNN ใช้
+    img = cv2.resize(img, (32,32))  # Resize ให้ CNN ใช้
     img = img.reshape(1, 32, 32, 1)  # ปรับเป็นรูปแบบที่ CNN ต้องการ
 
     # Predict กับ model.h5
