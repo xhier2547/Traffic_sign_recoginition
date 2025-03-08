@@ -74,7 +74,6 @@ def getCalssName(classNo):
     elif classNo == 40: return 'Roundabout mandatory'
     elif classNo == 41: return 'End of no passing'
     elif classNo == 42: return 'End of no passing by vechiles over 3.5 metric tons'
-    elif classNo == 43: return 'No U-Turn'
  
 while True:
     # READ IMAGE

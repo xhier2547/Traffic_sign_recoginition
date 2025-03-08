@@ -22,3 +22,4 @@ gunicorn
 tesseract
 pytesseract
 easyocr
+ultralytics

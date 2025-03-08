@@ -1,31 +1,74 @@
 from flask import Flask, request, render_template
 import cv2
 import numpy as np
+import os
 from tensorflow.keras.models import load_model
+from ultralytics import YOLO
 
 app = Flask(__name__)
 model = load_model("model.h5")
 
+# โหลดโมเดล YOLOv5
+yolo_model = YOLO("yolo12n.pt")  # หรือใช้โมเดล YOLO ที่เทรนกับป้ายจราจร
+
+def detect_traffic_sign_yolo5(image_path, output_path="static/detected_image.jpg"):
+    """
+    ใช้ YOLOv5 เพื่อตรวจจับป้ายจราจรและครอบเฉพาะป้าย
+    บันทึกภาพที่มี bounding box ไว้ที่ output_path
+    """
+    img = cv2.imread(image_path)
+    results = yolo_model(image_path)
+
+    detected = False  # ตรวจสอบว่ามีการตรวจจับหรือไม่
+
+    for result in results:
+        for box in result.boxes.xyxy:
+            x1, y1, x2, y2 = map(int, box[:4])  # ตำแหน่ง bounding box
+            detected = True
+
+            # วาดกรอบสี่เหลี่ยมบนภาพ
+            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
+            cv2.putText(img, "Traffic Sign", (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+            # ครอบเฉพาะป้ายจราจร
+            cropped_sign = cv2.imread(image_path)[y1:y2, x1:x2]
+
+            # บันทึกภาพที่มีกรอบ Bounding Box
+            cv2.imwrite(output_path, img)
+            return cropped_sign, output_path  # คืนค่า (ป้ายที่ถูกครอบ, ภาพที่มี bounding box)
+
+    # ถ้าไม่มีการตรวจจับ บันทึกภาพเดิม
+    cv2.imwrite(output_path, img)
+    return cv2.imread(image_path), output_path  # คืนค่า (ภาพต้นฉบับ, ภาพที่ไม่มีการ detect)
+
 def preprocess_image(img_path):
-    img = cv2.imread(img_path)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    """
+    ใช้ YOLO ตรวจจับป้ายจราจรก่อน แล้วทำการ preprocess ให้พร้อมพรีดิกต์
+    """
+    cropped_sign, detected_img_path = detect_traffic_sign_yolo5(img_path)
+
+    # ทำ preprocessing ให้โมเดล CNN
+    img = cv2.cvtColor(cropped_sign, cv2.COLOR_BGR2GRAY)
     img = cv2.equalizeHist(img)
     img = img / 255.0
     img = cv2.resize(img, (32, 32))
     img = img.reshape(1, 32, 32, 1)
-    return img
+    
+    return img, detected_img_path  # คืนค่าภาพที่ preprocess แล้ว และ path ของภาพที่ผ่าน YOLO
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     prediction = None
     image_path = None
+    detected_image_path = None  # เก็บ path ของภาพที่ detect แล้ว
 
     if request.method == "POST":
         file = request.files["image"]
         file_path = "static/uploaded_image.jpg"
         file.save(file_path)
 
-        img = preprocess_image(file_path)
+        img, detected_image_path = preprocess_image(file_path)
         predictions = model.predict(img)
         predicted_class = np.argmax(predictions, axis=1)[0]
 
@@ -76,14 +119,12 @@ def index():
             42: ("End of No Passing by Vehicles Over 3.5 Metric Tons", "สิ้นสุดข้อห้ามแซงสำหรับยานพาหนะที่มีน้ำหนักเกิน 3.5 ตัน")
         }
 
-
         predicted_label = class_labels.get(predicted_class, ("Unknown Sign", "ป้ายไม่รู้จัก"))
-        prediction_en = predicted_label[0]  # ภาษาอังกฤษ
-        prediction_th = predicted_label[1]  # ภาษาไทย
+        prediction_en = predicted_label[0]
+        prediction_th = predicted_label[1]
 
-
-        return render_template("index.html", prediction_en=prediction_en, prediction_th=prediction_th, image=file_path)
-
+        return render_template("index.html", prediction_en=prediction_en, prediction_th=prediction_th, 
+                               image=file_path, detected_image=detected_image_path)
 
     return render_template("index.html", prediction=prediction)
 
