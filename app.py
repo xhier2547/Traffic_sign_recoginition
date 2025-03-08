@@ -73,8 +73,7 @@ def index():
             39: ("Keep Left", "ชิดซ้าย"),
             40: ("Roundabout Mandatory", "ต้องใช้วงเวียน"),
             41: ("End of No Passing", "สิ้นสุดข้อห้ามแซง"),
-            42: ("End of No Passing by Vehicles Over 3.5 Metric Tons", "สิ้นสุดข้อห้ามแซงสำหรับยานพาหนะที่มีน้ำหนักเกิน 3.5 ตัน"),
-            43: ("No U-Turn", "ห้ามกลับรถ")
+            42: ("End of No Passing by Vehicles Over 3.5 Metric Tons", "สิ้นสุดข้อห้ามแซงสำหรับยานพาหนะที่มีน้ำหนักเกิน 3.5 ตัน")
         }
 
 
